@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 /**
  * Created by cunqingli on 2017/2/21.
- * <p>
  * 运行在B进程的Activity，尝试与主进程交互。
  */
 
@@ -25,10 +24,15 @@ public class BActivity extends Activity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             Toast.makeText(BActivity.this, "onServiceConnected", Toast.LENGTH_SHORT).show();
 
-            //连接成功之后，拿到一个IBinder，IBinder就是一个可跨进程的可操作的物件。
-            //如何使用这个IBinder呢?
+            /**
+             * 如何将service转化成IIterface使用呢？
+             */
 
-            //这样? NO!
+            /**
+             * 1，最直接的想法是instanceof，然后cast。
+             * 先看看是不是Stub类型。然而并不是。毕竟Stub是Server端创建Binder实体时用的。
+             * 那是不是Proxy类型呢？Sorry，Proxy是private的，无法判断。
+             */
             if (service instanceof SimpleAidlCopy.Stub) {
                 try {
                     int r = ((SimpleAidl.Stub) service).add(1, 2);
@@ -38,11 +42,8 @@ public class BActivity extends Activity {
                 }
             }
 
-            // 这样?OK
             /**
-             * 为什么要这么转化?
-             *
-             *
+             * 2，通过Stub的asInterface转化。OK的。
              */
             SimpleAidlCopy clazz = SimpleAidlCopy.Stub.asInterface(service);
             try {
@@ -60,7 +61,7 @@ public class BActivity extends Activity {
 
             /**
              * 能将Interface拿到对应的Binder实体吗？
-             * 实体肯定拿不到，而是代理：BinderProxy
+             * NO，实体肯定拿不到，而是代理：BinderProxy
              */
             IBinder binder = clazz.asBinder();
         }

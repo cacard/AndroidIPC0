@@ -2,16 +2,13 @@ package cacard.androidipc0;
 
 /**
  * Created by cunqingli on 2017/2/21.
- * 这个文件是从自动生成的（SimpleAidl.java）那里拷贝而来，并且重命名为SimpleAidlCopy。
- * 试验后确定可用。
- */
-
-/**
+ * 这个文件是从自动生成的（SimpleAidl.java）那里拷贝而来，并且重命名为SimpleAidlCopy，这样就可以任意修改了。
+ * -------------------------------------
  * 整体
  * - SimpleAidlCopy这个interface继承自IInterface，分为两部分：
  * 1) 操作定义；
  * 2) 一个static-member-class，Stub，继承自Binder，并且实现了SimpleAidlCopy接口。其实这个Stub完全可以拿到外面去。
- * <p>
+ * -------------------------------------
  * 重要概念
  * 【IInterface】
  * - Binder-Interface（就是Server/Client都可以相互遵守的契约）
@@ -25,14 +22,18 @@ package cacard.androidipc0;
  */
 public interface SimpleAidlCopy extends android.os.IInterface {
 
+    /**
+     * 接口中的操作定义，供Server/Client共同使用。
+     */
     public int add(int x, int y) throws android.os.RemoteException;
 
     /**
      * Local-side IPC implementation stub class.
-     * <p>
-     * 重要类型。onBind时，直接返回的就是这个类的实现。
+     * ------------------------------------------
+     * todo 分析一下Binder的注释
+     * ------------------------------------------
+     * 重要类型。Server的onBind时，直接返回的就是这个类的实现。
      * 继承自Binder，说明是一个【Binder本地对象】
-     * <p>
      * Stub是Server端作为Binder真身的“存根”。通过它，能创建一个【Binder真身】，运行在Server中。
      * Stub实现了Binder-Interface，且继承自Binder。
      */
@@ -53,16 +54,16 @@ public interface SimpleAidlCopy extends android.os.IInterface {
          * generating a proxy if needed.
          * 上面自带的注释是说，将obj转化成interface，或者新建一个proxy。
          * 其实，前者是在Server中发生的，后者是在Client中发生的。
-         * <p>
+         * ------------------------------------------
          * Client在什么时候调用的？
          * 进程B（Client）在拿到Server传过来的IBinder时：
          * SimpleAidlCopy clazz = SimpleAidlCopy.Stub.asInterface(service);
          * 其实参数service是个BinderProxy类型。
-         * <p>
+         * ------------------------------------------
          * 将一个Binder转化成当前Binder-Interface，为啥不直接转换呢？
          * 比如像这样：if(obj instanceof SimpleAidlCopy) { return (SimpleAidlCopy)obj; }
          * Debug发现，obj其实是个android.os.BinderProxy类型!，所以不能强制转换。
-         * <p>
+         ** ------------------------------------------
          * from http://weishu.me/2016/01/12/binder-index-for-newer/
          * 函数的参数IBinder类型的obj，这个对象是驱动给我们的，
          * 如果是Binder本地对象，那么它就是Binder类型，如果是Binder代理对象，那就是BinderProxy类型；
@@ -90,8 +91,6 @@ public interface SimpleAidlCopy extends android.os.IInterface {
          * 将一个IInterface转化成Binder实体
          * 1）如果在Client进程中，拿到的是BinderProxy；
          * 2）如果在Server进程中，拿到的是Binder真身；
-         *
-         * @return
          */
         @Override
         public android.os.IBinder asBinder() {
@@ -129,8 +128,6 @@ public interface SimpleAidlCopy extends android.os.IInterface {
 
             /**
              * remote是个BinderProxy类型
-             *
-             * @param remote
              */
             Proxy(android.os.IBinder remote) {
                 mRemote = remote;
@@ -147,11 +144,6 @@ public interface SimpleAidlCopy extends android.os.IInterface {
 
             /**
              * Proxy这个方法里面是写数据（向Server写数据），然后等待reply。
-             *
-             * @param x
-             * @param y
-             * @return
-             * @throws android.os.RemoteException
              */
             @Override
             public int add(int x, int y) throws android.os.RemoteException {
@@ -175,6 +167,5 @@ public interface SimpleAidlCopy extends android.os.IInterface {
 
         static final int TRANSACTION_add = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
     }
-
-
+    
 }
