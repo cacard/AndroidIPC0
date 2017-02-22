@@ -39,7 +39,11 @@ public class BActivity extends Activity {
             }
 
             // 这样?OK
-            // todo 重点分析
+            /**
+             * 为什么要这么转化?
+             *
+             *
+             */
             SimpleAidlCopy clazz = SimpleAidlCopy.Stub.asInterface(service);
             try {
                 int r = clazz.add(1, 2);
@@ -47,6 +51,18 @@ public class BActivity extends Activity {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+
+            /**
+             * 再次asInterface，会是不同的BinderProxy吗？
+             * 是的，查看asInterface，你也会发现，Client调用这个，总是会new一个Proxy出来！
+             */
+            SimpleAidlCopy clazz2 = SimpleAidlCopy.Stub.asInterface(service);
+
+            /**
+             * 能将Interface拿到对应的Binder实体吗？
+             * 实体肯定拿不到，而是代理：BinderProxy
+             */
+            IBinder binder = clazz.asBinder();
         }
 
         @Override
