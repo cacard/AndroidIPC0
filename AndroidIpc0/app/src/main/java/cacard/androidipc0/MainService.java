@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by cunqingli on 2017/2/21.
@@ -27,6 +28,11 @@ public class MainService extends Service {
         SimpleAidlCopy.Stub stub = new SimpleAidlCopy.Stub() {
             @Override
             public int add(int x, int y) throws RemoteException {
+
+                // 这里是哪个线程呢？Binder线程池？(线程名为Binder_x)
+                String msg = "@MainService/onBind/Stub.add(), thread:" + Thread.currentThread().getName();
+                Global.logGlobal(msg);
+
                 return x + y;
             }
         };

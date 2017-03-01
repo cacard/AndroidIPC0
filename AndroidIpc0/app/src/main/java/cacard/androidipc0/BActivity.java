@@ -48,7 +48,7 @@ public class BActivity extends Activity {
             SimpleAidlCopy clazz = SimpleAidlCopy.Stub.asInterface(service);
             try {
                 int r = clazz.add(1, 2);
-                Toast.makeText(BActivity.this, "result:" + r, Toast.LENGTH_SHORT).show();
+                Toast.makeText(BActivity.this, "result:" + r + "/ thread:" + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
