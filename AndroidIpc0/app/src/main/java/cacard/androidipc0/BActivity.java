@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -18,6 +19,8 @@ import android.widget.Toast;
  */
 
 public class BActivity extends Activity {
+
+    SimpleAidlCopy mService;
 
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -46,9 +49,25 @@ public class BActivity extends Activity {
              * 2，通过Stub的asInterface转化。OK的。
              */
             SimpleAidlCopy clazz = SimpleAidlCopy.Stub.asInterface(service);
+            mService = clazz;
             try {
                 int r = clazz.add(1, 2);
                 Toast.makeText(BActivity.this, "result:" + r + "/ thread:" + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            /**
+             * 死亡连接。我去！
+             */
+            try {
+                clazz.asBinder().linkToDeath(new IBinder.DeathRecipient() {
+                    @Override
+                    public void binderDied() {
+                        // 在哪个线程呢？
+                        Global.logGlobal("binderDied @Thread:" + Thread.currentThread().getName());
+                    }
+                }, 0);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -68,7 +87,7 @@ public class BActivity extends Activity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            Global.logGlobal("onServiceDisconnected @Thread:" + Thread.currentThread().getName());
         }
     };
 
@@ -77,19 +96,75 @@ public class BActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+
+        // add
         TextView textView = new TextView(this);
-        textView.setText("execute add()");
+        textView.setPadding(30, 30, 30, 30);
+        textView.setBackgroundColor(Color.RED);
+        textView.setText("startBind");
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startBind();
             }
         });
+
+        // unbind
+        TextView tvUnbind = new TextView(this);
+        tvUnbind.setText("unbindService");
+        tvUnbind.setPadding(30, 30, 30, 30);
+        tvUnbind.setBackgroundColor(Color.BLUE);
+        tvUnbind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mConnection != null) {
+                    try {
+                        /**
+                         * 直接调用unbind并不会引发onServiceDisconnected()!!!
+                         */
+                        BActivity.this.unbindService(mConnection);
+
+                        /**
+                         * Stop，也不会引发onServiceDisconnected()!!!
+                         */
+                        BActivity.this.stopService(new Intent(BActivity.this, MainService.class));
+
+
+                        /**
+                         * 看文档
+                         * Called when a connection to the Service has been lost.  This typically
+                         * happens when the process hosting the service has crashed or been killed.
+                         * This does <em>not</em> remove the ServiceConnection itself -- this
+                         * binding to the service will remain active, and you will receive a call
+                         * to {@link #onServiceConnected} when the Service is next running.
+                         *
+                         * 通常是service所在进程Crash了！
+                         */
+
+                        /**
+                         * 那就来个特殊操作，让Service Crash
+                         */
+                        if (mService != null) {
+                            mService.add(-1, -1);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
         ll.addView(textView);
+        ll.addView(tvUnbind);
+
         setContentView(ll);
     }
 
     private void startBind() {
         bindService(new Intent(this, MainService.class), mConnection, BIND_AUTO_CREATE);
     }
+
+
 }

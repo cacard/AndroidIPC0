@@ -19,6 +19,12 @@ public class MainService extends Service {
 
     private static final String TAG = "MainService";
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Global.logGlobal("MainService onCreate()");
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -32,6 +38,12 @@ public class MainService extends Service {
                 // 这里是哪个线程呢？Binder线程池？(线程名为Binder_x)
                 String msg = "@MainService/onBind/Stub.add(), thread:" + Thread.currentThread().getName();
                 Global.logGlobal(msg);
+
+                // Crash操作
+                if (x == -1 && y == -1) {
+                    int a = 0;
+                    int c = 10 / a;
+                }
 
                 return x + y;
             }
