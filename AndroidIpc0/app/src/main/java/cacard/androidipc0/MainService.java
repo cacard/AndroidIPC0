@@ -39,8 +39,11 @@ public class MainService extends Service {
                 String msg = "@MainService/onBind/Stub.add(), thread:" + Thread.currentThread().getName();
                 Global.logGlobal(msg);
 
-                // Crash操作
+                // Crash操作，没用！外面有catch
                 if (x == -1 && y == -1) {
+
+                    MainService.this.crashAtService(); //让Service自身Crash
+
                     int a = 0;
                     int c = 10 / a;
                 }
@@ -59,5 +62,10 @@ public class MainService extends Service {
         }
 
         return stub;
+    }
+
+    private void crashAtService() {
+        int a = 0;
+        int b = 1/a;
     }
 }
