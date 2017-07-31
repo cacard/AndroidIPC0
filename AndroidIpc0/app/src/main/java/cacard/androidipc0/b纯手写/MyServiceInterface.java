@@ -6,6 +6,8 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+import cacard.androidipc0.MyIInterfaceCopy;
+
 /**
  * Created by cunqingli on 2017/2/27.
  * <p>
@@ -82,7 +84,7 @@ public interface MyServiceInterface extends IInterface {
             }
 
             android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
-            if (((iin != null) && (iin instanceof cacard.androidipc0.SimpleAidlCopy))) {
+            if (((iin != null) && (iin instanceof MyIInterfaceCopy))) {
                 return ((MyServiceInterface) iin);
             }
 

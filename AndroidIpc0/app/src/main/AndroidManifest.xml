@@ -18,7 +18,7 @@
 
         <service android:name=".MainService" />
 
-        <activity android:name=".BActivity" android:process=":B"></activity>
+        <activity android:name=".ClientActivity" android:process=":B"></activity>
 
     </application>
 

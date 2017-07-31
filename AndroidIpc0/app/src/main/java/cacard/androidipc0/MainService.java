@@ -2,12 +2,10 @@ package cacard.androidipc0;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by cunqingli on 2017/2/21.
@@ -31,7 +29,7 @@ public class MainService extends Service {
         /**
          * Server传给Client一个new Stub();
          */
-        SimpleAidlCopy.Stub stub = new SimpleAidlCopy.Stub() {
+        MyIInterfaceCopy.Stub stub = new MyIInterfaceCopy.Stub() {
             @Override
             public int add(int x, int y) throws RemoteException {
 
@@ -57,7 +55,7 @@ public class MainService extends Service {
          * 就是Binder真身，即SimpleAidlCopy.Stub
          */
         IBinder binder = stub.asBinder();
-        if (binder instanceof SimpleAidlCopy.Stub) {
+        if (binder instanceof MyIInterfaceCopy.Stub) {
             Log.i(TAG, "@Server, so asBinder() return RealBinder.");
         }
 

@@ -18,14 +18,14 @@ import android.widget.Toast;
  * 运行在B进程的Activity，尝试与主进程交互。
  */
 
-public class BActivity extends Activity {
+public class ClientActivity extends Activity {
 
-    SimpleAidlCopy mService;
+    MyIInterfaceCopy mService;
 
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Toast.makeText(BActivity.this, "onServiceConnected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ClientActivity.this, "onServiceConnected", Toast.LENGTH_SHORT).show();
 
             /**
              * 如何将service转化成IIterface使用呢？
@@ -36,10 +36,10 @@ public class BActivity extends Activity {
              * 先看看是不是Stub类型。然而并不是。毕竟Stub是Server端创建Binder实体时用的。
              * 那是不是Proxy类型呢？Sorry，Proxy是private的，无法判断。
              */
-            if (service instanceof SimpleAidlCopy.Stub) {
+            if (service instanceof MyIInterfaceCopy.Stub) {
                 try {
                     int r = ((SimpleAidl.Stub) service).add(1, 2);
-                    Toast.makeText(BActivity.this, "result:" + r, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ClientActivity.this, "result:" + r, Toast.LENGTH_SHORT).show();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -48,11 +48,11 @@ public class BActivity extends Activity {
             /**
              * 2，通过Stub的asInterface转化。OK的。
              */
-            SimpleAidlCopy clazz = SimpleAidlCopy.Stub.asInterface(service);
+            MyIInterfaceCopy clazz = MyIInterfaceCopy.Stub.asInterface(service);
             mService = clazz;
             try {
                 int r = clazz.add(1, 2);
-                Toast.makeText(BActivity.this, "result:" + r + "/ thread:" + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ClientActivity.this, "result:" + r + "/ thread:" + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -76,7 +76,7 @@ public class BActivity extends Activity {
              * 再次asInterface，会是不同的BinderProxy吗？
              * 是的，查看asInterface，你也会发现，Client调用这个，总是会new一个Proxy出来！
              */
-            SimpleAidlCopy clazz2 = SimpleAidlCopy.Stub.asInterface(service);
+            MyIInterfaceCopy clazz2 = MyIInterfaceCopy.Stub.asInterface(service);
 
             /**
              * 能将Interface拿到对应的Binder实体吗？
@@ -123,12 +123,12 @@ public class BActivity extends Activity {
                         /**
                          * 直接调用unbind并不会引发onServiceDisconnected()!!!
                          */
-                        BActivity.this.unbindService(mConnection);
+                        ClientActivity.this.unbindService(mConnection);
 
                         /**
                          * Stop，也不会引发onServiceDisconnected()!!!
                          */
-                        BActivity.this.stopService(new Intent(BActivity.this, MainService.class));
+                        ClientActivity.this.stopService(new Intent(ClientActivity.this, MainService.class));
 
 
                         /**

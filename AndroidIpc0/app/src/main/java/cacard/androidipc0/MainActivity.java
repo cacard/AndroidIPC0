@@ -24,11 +24,11 @@ public class MainActivity extends Activity {
 
         LinearLayout ll = new LinearLayout(this);
         TextView tv = new TextView(this);
-        tv.setText("go to BActivity");
+        tv.setText("go to ClientActivity");
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, BActivity.class));
+                startActivity(new Intent(MainActivity.this, ClientActivity.class));
             }
         });
         ll.addView(tv);

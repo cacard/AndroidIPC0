@@ -2,6 +2,7 @@ package cacard.androidipc0;
 
 /**
  * Created by cunqingli on 2017/2/21.
+ *
  * 这个文件是从自动生成的（SimpleAidl.java）那里拷贝而来，并且重命名为SimpleAidlCopy，这样就可以任意修改了。
  * -------------------------------------
  * 整体
@@ -15,12 +16,13 @@ package cacard.androidipc0;
  * - IInterface只定义了一个操作asBinder，即：Binder-Interface转化成Binder，需要调用这个操作。而不是使用强制转换。
  * 【IBinder】
  * - 代表具有跨进程的能力。所有Binder实体必须实现IBinder。
+ * - Stub以及Proxy中的mRemote（类型是ProxyBinder）都实现了Binder
  * 【Binder本地对象】
  * - 指Binder真身，仅在Server中有一个，其它地方有很多它的引用。
  * 【BinderProxy】
  * - 是对Binder真身的代理
  */
-public interface SimpleAidlCopy extends android.os.IInterface {
+public interface MyIInterfaceCopy extends android.os.IInterface {
 
     /**
      * 接口中的操作定义，供Server/Client共同使用。
@@ -35,33 +37,44 @@ public interface SimpleAidlCopy extends android.os.IInterface {
      * 重要类型。Server的onBind时，直接返回的就是这个类的实现。
      * 继承自Binder，说明是一个【Binder本地对象】
      * Stub是Server端作为Binder真身的“存根”。通过它，能创建一个【Binder真身】，运行在Server中。
+     * Stub还包含了一个static的Proxy
      * Stub实现了Binder-Interface，且继承自Binder。
      */
-    public static abstract class Stub extends android.os.Binder implements cacard.androidipc0.SimpleAidlCopy {
+    public static abstract class Stub extends android.os.Binder implements MyIInterfaceCopy {
 
-        private static final java.lang.String DESCRIPTOR = "cacard.androidipc0.SimpleAidlCopy";
+        /**
+         * Binder实体的标识符。
+         * 为什么使用标识符？驱动中就是用这个查找的？
+         */
+        private static final java.lang.String DESCRIPTOR = "cacard.androidipc0.MyIInterfaceCopy";
 
         /**
          * Construct the stub at attach it to the interface.
+         * 在一个Binder实体创建时，会吧自己与标识符绑定
          */
         public Stub() {
+            // 两个参数分别对应mOwner和mDescriptor
+            // 这俩家伙仅在queryLocalInterface时使用，仅仅是用来做这个操作的？
             this.attachInterface(this, DESCRIPTOR);
         }
 
         /**
          * asInterface(android.os.IBinder obj):
-         * Cast an IBinder object into an cacard.androidipc0.SimpleAidlCopy interface,
+         * Cast an IBinder object into an cacard.androidipc0.MyIInterfaceCopy interface,
          * generating a proxy if needed.
          * 上面自带的注释是说，将obj转化成interface，或者新建一个proxy。
          * 其实，前者是在Server中发生的，后者是在Client中发生的。
          * ------------------------------------------
+         * 参数obj是一个BinderProxy类型（在Binder中定义，是private的）
+         * 而Proxy里面的mRemote就是这个BinderProxy类型，最后调用的是它的transcate()方法。
+         * ------------------------------------------
          * Client在什么时候调用的？
          * 进程B（Client）在拿到Server传过来的IBinder时：
-         * SimpleAidlCopy clazz = SimpleAidlCopy.Stub.asInterface(service);
+         * MyIInterfaceCopy clazz = MyIInterfaceCopy.Stub.asInterface(service);
          * 其实参数service是个BinderProxy类型。
          * ------------------------------------------
          * 将一个Binder转化成当前Binder-Interface，为啥不直接转换呢？
-         * 比如像这样：if(obj instanceof SimpleAidlCopy) { return (SimpleAidlCopy)obj; }
+         * 比如像这样：if(obj instanceof MyIInterfaceCopy) { return (MyIInterfaceCopy)obj; }
          * Debug发现，obj其实是个android.os.BinderProxy类型!，所以不能强制转换。
          ** ------------------------------------------
          * from http://weishu.me/2016/01/12/binder-index-for-newer/
@@ -72,19 +85,21 @@ public interface SimpleAidlCopy extends android.os.IInterface {
          * 如果找不到，说明是远程对象（处于另外一个进程）那么就需要创建一个Binde代理对象，让这个Binder代理实现对于远程对象的访问。
          * 一般来说，如果是与一个远程Service对象进行通信，那么这里返回的一定是一个Binder代理对象，这个IBinder参数的实际上是BinderProxy;
          */
-        public static cacard.androidipc0.SimpleAidlCopy asInterface(android.os.IBinder obj) {
+        public static MyIInterfaceCopy asInterface(android.os.IBinder obj) {
             if ((obj == null)) {
                 return null;
             }
 
-            //尝试查找Binder本地对象。如果是不同进程，这个obj其实BinderProxy，其queryLocalInterface总是返回null。
+            // 尝试查找Binder本地对象。
+            // 如果是不同进程，这个obj其实BinderProxy，其queryLocalInterface总是返回null。
+            // ？？BinderProxy有queryLocalInterface吗？BinderProxy仅仅是一个BinderInterface啊
             android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
-            if (((iin != null) && (iin instanceof cacard.androidipc0.SimpleAidlCopy))) {
-                return ((cacard.androidipc0.SimpleAidlCopy) iin);
+            if (((iin != null) && (iin instanceof MyIInterfaceCopy))) {
+                return ((MyIInterfaceCopy) iin);
             }
 
             //如果是在Client进程，总是会走这句。
-            return new cacard.androidipc0.SimpleAidlCopy.Stub.Proxy(obj);
+            return new MyIInterfaceCopy.Stub.Proxy(obj);
         }
 
         /**
@@ -97,6 +112,9 @@ public interface SimpleAidlCopy extends android.os.IInterface {
             return this;
         }
 
+        /**
+         * Server的Binder线程池里面执行的操作，执行后向Binder驱动写入结果数据。
+         */
         @Override
         public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException {
             switch (code) {
@@ -120,10 +138,13 @@ public interface SimpleAidlCopy extends android.os.IInterface {
         }
 
         /**
-         * Proxy供Client使用
-         * 即，Clien端的Proxy是Server端Binder真是的引用。而且Client只能通过Proxy指向Binder真身。
+         * Proxy供Client使用，其实是个BinderProxy的代理。
          */
-        private static class Proxy implements cacard.androidipc0.SimpleAidlCopy {
+        private static class Proxy implements MyIInterfaceCopy {
+
+            /**
+             * BinderProxy类型
+             */
             private android.os.IBinder mRemote;
 
             /**
@@ -143,6 +164,7 @@ public interface SimpleAidlCopy extends android.os.IInterface {
             }
 
             /**
+             * 在Client进程里面进行操作。
              * Proxy这个方法里面是写数据（向Server写数据），然后等待reply。
              */
             @Override
@@ -154,6 +176,7 @@ public interface SimpleAidlCopy extends android.os.IInterface {
                     _data.writeInterfaceToken(DESCRIPTOR);
                     _data.writeInt(x);
                     _data.writeInt(y);
+                    // 走向ProxyBinder，最后走向natvie，最后在Client的Binder线程池里面执行
                     mRemote.transact(Stub.TRANSACTION_add, _data, _reply, 0);
                     _reply.readException();
                     _result = _reply.readInt();
