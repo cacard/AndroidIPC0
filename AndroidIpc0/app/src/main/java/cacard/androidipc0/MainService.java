@@ -26,16 +26,18 @@ public class MainService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+
+        // @ server's main thread
+        Global.logGlobal("[Server][onBind] thread:" + Thread.currentThread().getName());
+
         /**
          * Server传给Client一个new Stub();
          */
         MyIInterfaceCopy.Stub stub = new MyIInterfaceCopy.Stub() {
             @Override
             public int add(int x, int y) throws RemoteException {
-
-                // 这里是哪个线程呢？Binder线程池？(线程名为Binder_x)
-                String msg = "@MainService/onBind/Stub.add(), thread:" + Thread.currentThread().getName();
-                Global.logGlobal(msg);
+                // @ thread Binder_2
+                Global.logGlobal("[Server][StubImpl.add()] thread:" + Thread.currentThread().getName());
 
                 // Crash操作，没用！外面有catch
                 if (x == -1 && y == -1) {
@@ -64,6 +66,6 @@ public class MainService extends Service {
 
     private void crashAtService() {
         int a = 0;
-        int b = 1/a;
+        int b = 1 / a;
     }
 }

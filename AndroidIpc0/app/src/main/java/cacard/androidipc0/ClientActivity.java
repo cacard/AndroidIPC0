@@ -25,7 +25,8 @@ public class ClientActivity extends Activity {
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Toast.makeText(ClientActivity.this, "onServiceConnected", Toast.LENGTH_SHORT).show();
+            // @ thread main
+            Global.logGlobal("[Client][onServiceConnected] thread:" + Thread.currentThread().getName());
 
             /**
              * 如何将service转化成IIterface使用呢？

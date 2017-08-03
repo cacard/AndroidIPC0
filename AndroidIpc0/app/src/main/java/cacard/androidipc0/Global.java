@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class Global {
 
-    public static final String TAG_Global = "tagglobal";
+    public static final String TAG_Global = "global";
 
     public static void logGlobal(String msg) {
         Log.i(TAG_Global, msg);

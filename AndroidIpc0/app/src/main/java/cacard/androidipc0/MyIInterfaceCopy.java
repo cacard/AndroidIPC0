@@ -117,6 +117,9 @@ public interface MyIInterfaceCopy extends android.os.IInterface {
          */
         @Override
         public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException {
+            // @ thread Binder_2
+            Global.logGlobal("[Stub.onTransact()] thread:" + Thread.currentThread().getName());
+
             switch (code) {
                 case INTERFACE_TRANSACTION: {
                     reply.writeString(DESCRIPTOR);
@@ -169,6 +172,9 @@ public interface MyIInterfaceCopy extends android.os.IInterface {
              */
             @Override
             public int add(int x, int y) throws android.os.RemoteException {
+                // @ thread main
+                Global.logGlobal("[Proxy.add()] thread:" + Thread.currentThread().getName());
+
                 android.os.Parcel _data = android.os.Parcel.obtain();
                 android.os.Parcel _reply = android.os.Parcel.obtain();
                 int _result;
